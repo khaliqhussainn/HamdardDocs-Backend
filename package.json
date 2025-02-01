@@ -9,7 +9,7 @@
     "start": "node server.js",
     "dev": "nodemon server.js",
     "postinstall": "prisma generate",
-    "build": "npx prisma migrate && npx prisma generate && prisma migrate deploy && npx prisma db push",
+    "build": "npx prisma migrate && npx prisma generate && npx prisma migrate deploy && npx prisma db push",
     "prisma:setup": "node prisma/setup-migration.js",
     "prisma:generate": "node prisma/generate-client.js",
     "prisma:reset": "prisma migrate reset --force",
@@ -17,7 +17,7 @@
     "prisma:studio": "prisma studio"
   },
   "dependencies": {
-    "@prisma/client": "^5.22.0",
+    "@prisma/client": "^6.3.0",
     "body-parser": "^1.20.3",
     "cloudinary": "^2.5.1",
     "cors": "^2.8.5",
@@ -26,10 +26,10 @@
     "fs": "^0.0.1-security",
     "multer": "^1.4.5-lts.1",
     "os": "^0.1.2",
-    "path": "^0.12.7",
-    "prisma": "^6.3.0"
+    "path": "^0.12.7"
   },
   "devDependencies": {
-    "nodemon": "^3.1.9"
+    "nodemon": "^3.1.9",
+    "prisma": "^6.3.0"
   }
 }

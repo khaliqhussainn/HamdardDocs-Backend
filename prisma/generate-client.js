@@ -4,25 +4,21 @@ const fs = require('fs');
 
 async function generatePrismaClient() {
   try {
-    // Ensure we're in the correct directory
     const prismaDir = path.join(__dirname);
     process.chdir(prismaDir);
     
     console.log('🚀 Starting Prisma Client generation...');
     
-    // Check if schema.prisma exists
     if (!fs.existsSync(path.join(prismaDir, 'schema.prisma'))) {
       throw new Error('schema.prisma not found in ' + prismaDir);
     }
     
-    // Clean up existing generated client if it exists
     const generatedClientPath = path.join(prismaDir, 'generated', 'client');
     if (fs.existsSync(generatedClientPath)) {
       console.log('📦 Cleaning up existing generated client...');
       fs.rmSync(generatedClientPath, { recursive: true, force: true });
     }
     
-    // Run prisma generate with better error handling
     console.log('⚙️ Generating Prisma Client...');
     execSync('npx prisma generate', {
       stdio: 'inherit',

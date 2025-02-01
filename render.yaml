@@ -2,7 +2,7 @@ services:
   - type: web
     name: backend
     env: node
-    buildCommand: npx prisma migrate && npx prisma generate && prisma migrate deploy && npx prisma db push
+    buildCommand: npm run build
     startCommand: node server.js
     envVars:
       - key: DATABASE_URL

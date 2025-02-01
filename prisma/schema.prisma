@@ -1,15 +1,11 @@
-// schema.prisma
 generator client {
   provider = "prisma-client-js"
   output   = "./generated/client"
-  // Added previewFeatures for better MySQL support
-  previewFeatures = ["fullTextSearch", "fullTextIndex"]
 }
 
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
-  // Added relationMode for better MySQL compatibility
   relationMode = "foreignKeys"
 }
 
@@ -25,11 +21,9 @@ model Note {
   createdAt DateTime @default(now()) @db.Timestamp(6)
   updatedAt DateTime @updatedAt @db.Timestamp(6)
 
-  // Improved indexing strategy
   @@index([year, subject])
   @@index([type, course])
-  @@fulltext([title]) // Added for better search capabilities
+  @@fulltext([title])
 
-  // Added proper table name
   @@map("notes")
 }

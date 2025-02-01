@@ -7,7 +7,6 @@ const {
   PrismaClientRustPanicError,
   PrismaClientInitializationError,
   PrismaClientValidationError,
-  NotFoundError,
   getPrismaClient,
   sqltag,
   empty,
@@ -22,7 +21,8 @@ const {
   warnOnce,
   defineDmmfProperty,
   Public,
-  getRuntime
+  getRuntime,
+  createParam,
 } = require('./runtime/edge.js')
 
 
@@ -32,11 +32,11 @@ exports.Prisma = Prisma
 exports.$Enums = {}
 
 /**
- * Prisma Client JS version: 5.22.0
+ * Prisma Client JS version: 6.3.0
  * Query Engine version: acc0b9dd43eb689cbd20c9470515d719db10d0b0
  */
 Prisma.prismaVersion = {
-  client: "5.22.0",
+  client: "6.3.0",
   engine: "acc0b9dd43eb689cbd20c9470515d719db10d0b0"
 }
 
@@ -45,7 +45,6 @@ Prisma.PrismaClientUnknownRequestError = PrismaClientUnknownRequestError
 Prisma.PrismaClientRustPanicError = PrismaClientRustPanicError
 Prisma.PrismaClientInitializationError = PrismaClientInitializationError
 Prisma.PrismaClientValidationError = PrismaClientValidationError
-Prisma.NotFoundError = NotFoundError
 Prisma.Decimal = Decimal
 
 /**
@@ -146,10 +145,7 @@ const config = {
         "native": true
       }
     ],
-    "previewFeatures": [
-      "fullTextIndex",
-      "fullTextSearch"
-    ],
+    "previewFeatures": [],
     "sourceFilePath": "E:\\HamdardDocs-Backend\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
@@ -158,13 +154,12 @@ const config = {
     "schemaEnvPath": "../../../.env"
   },
   "relativePath": "../..",
-  "clientVersion": "5.22.0",
+  "clientVersion": "6.3.0",
   "engineVersion": "acc0b9dd43eb689cbd20c9470515d719db10d0b0",
   "datasourceNames": [
     "db"
   ],
   "activeProvider": "mysql",
-  "postinstall": true,
   "inlineDatasources": {
     "db": {
       "url": {
@@ -173,8 +168,8 @@ const config = {
       }
     }
   },
-  "inlineSchema": "// schema.prisma\ngenerator client {\n  provider        = \"prisma-client-js\"\n  output          = \"./generated/client\"\n  // Added previewFeatures for better MySQL support\n  previewFeatures = [\"fullTextSearch\", \"fullTextIndex\"]\n}\n\ndatasource db {\n  provider     = \"mysql\"\n  url          = env(\"DATABASE_URL\")\n  // Added relationMode for better MySQL compatibility\n  relationMode = \"foreignKeys\"\n}\n\nmodel Note {\n  id        Int      @id @default(autoincrement())\n  title     String   @db.VarChar(255)\n  fileUrl   String   @db.Text\n  year      String   @db.VarChar(4)\n  subject   String   @db.VarChar(100)\n  course    String   @db.VarChar(100)\n  type      String   @db.VarChar(50)\n  folder    String   @db.VarChar(255)\n  createdAt DateTime @default(now()) @db.Timestamp(6)\n  updatedAt DateTime @updatedAt @db.Timestamp(6)\n\n  // Improved indexing strategy\n  @@index([year, subject])\n  @@index([type, course])\n  @@fulltext([title]) // Added for better search capabilities\n  // Added proper table name\n  @@map(\"notes\")\n}\n",
-  "inlineSchemaHash": "4bab0d19e3c93fdf1542d83b4af9332f5802ce0b6da4661c5d611a669ad4630b",
+  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"./generated/client\"\n}\n\ndatasource db {\n  provider     = \"mysql\"\n  url          = env(\"DATABASE_URL\")\n  relationMode = \"foreignKeys\"\n}\n\nmodel Note {\n  id        Int      @id @default(autoincrement())\n  title     String   @db.VarChar(255)\n  fileUrl   String   @db.Text\n  year      String   @db.VarChar(4)\n  subject   String   @db.VarChar(100)\n  course    String   @db.VarChar(100)\n  type      String   @db.VarChar(50)\n  folder    String   @db.VarChar(255)\n  createdAt DateTime @default(now()) @db.Timestamp(6)\n  updatedAt DateTime @updatedAt @db.Timestamp(6)\n\n  @@index([year, subject])\n  @@index([type, course])\n  @@fulltext([title])\n  @@map(\"notes\")\n}\n",
+  "inlineSchemaHash": "83cf391078d34af18405274f7eb786225506e5bc12ccc8a5c88981c453087854",
   "copyEngine": true
 }
 config.dirname = '/'
@@ -182,6 +177,7 @@ config.dirname = '/'
 config.runtimeDataModel = JSON.parse("{\"models\":{\"Note\":{\"dbName\":\"notes\",\"schema\":null,\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":true,\"isUnique\":false,\"isId\":true,\"isReadOnly\":false,\"hasDefaultValue\":true,\"type\":\"Int\",\"nativeType\":null,\"default\":{\"name\":\"autoincrement\",\"args\":[]},\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"title\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":true,\"isUnique\":false,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":false,\"type\":\"String\",\"nativeType\":[\"VarChar\",[\"255\"]],\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"fileUrl\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":true,\"isUnique\":false,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":false,\"type\":\"String\",\"nativeType\":[\"Text\",[]],\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"year\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":true,\"isUnique\":false,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":false,\"type\":\"String\",\"nativeType\":[\"VarChar\",[\"4\"]],\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"subject\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":true,\"isUnique\":false,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":false,\"type\":\"String\",\"nativeType\":[\"VarChar\",[\"100\"]],\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"course\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":true,\"isUnique\":false,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":false,\"type\":\"String\",\"nativeType\":[\"VarChar\",[\"100\"]],\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"type\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":true,\"isUnique\":false,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":false,\"type\":\"String\",\"nativeType\":[\"VarChar\",[\"50\"]],\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"folder\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":true,\"isUnique\":false,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":false,\"type\":\"String\",\"nativeType\":[\"VarChar\",[\"255\"]],\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":true,\"isUnique\":false,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":true,\"type\":\"DateTime\",\"nativeType\":[\"Timestamp\",[\"6\"]],\"default\":{\"name\":\"now\",\"args\":[]},\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":true,\"isUnique\":false,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":false,\"type\":\"DateTime\",\"nativeType\":[\"Timestamp\",[\"6\"]],\"isGenerated\":false,\"isUpdatedAt\":true}],\"primaryKey\":null,\"uniqueFields\":[],\"uniqueIndexes\":[],\"isGenerated\":false}},\"enums\":{},\"types\":{}}")
 defineDmmfProperty(exports.Prisma, config.runtimeDataModel)
 config.engineWasm = undefined
+config.compilerWasm = undefined
 
 config.injectableEdgeEnv = () => ({
   parsed: {
