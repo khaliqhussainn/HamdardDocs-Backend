@@ -1,0 +1,25 @@
+datasource db {
+  provider = "mysql" // or your database provider
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/client"
+}
+
+model Note {
+  id        Int      @id @default(autoincrement())
+  title     String
+  fileUrl   String
+  year      String
+  subject   String
+  course    String
+  type      String
+  folder    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([year])
+  @@index([type])
+}
