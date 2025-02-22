@@ -149,7 +149,7 @@ app.delete("/api/files/:id", asyncHandler(async (req, res) => {
   });
 
   if (!note) {
-    return res.status(404).json({ message: "File not found" });
+    return res.status(404).json({ message: "Files not found" });
   }
 
   try {
