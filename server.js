@@ -93,9 +93,9 @@ app.get("/api/files", asyncHandler(async (req, res) => {
       stack: error.stack,
       queryYear: year
     });
-    res.status(500).json({ 
-      message: 'Failed to retrieve files', 
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined 
+    res.status(500).json({
+      message: 'Failed to retrieve files',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 }));
@@ -132,7 +132,14 @@ app.post("/api/files", upload.single("file"), asyncHandler(async (req, res) => {
     if (req.file && fs.existsSync(req.file.path)) {
       fs.unlinkSync(req.file.path);
     }
-    throw error;
+    console.error('File Upload Error:', {
+      message: error.message,
+      stack: error.stack
+    });
+    res.status(500).json({
+      message: 'Failed to upload file',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 }));
 
@@ -155,8 +162,14 @@ app.delete("/api/files/:id", asyncHandler(async (req, res) => {
 
     res.json({ message: "File deleted successfully" });
   } catch (error) {
-    console.error('Delete operation failed:', error);
-    throw error;
+    console.error('Delete Operation Failed:', {
+      message: error.message,
+      stack: error.stack
+    });
+    res.status(500).json({
+      message: 'Failed to delete file',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 }));
 
