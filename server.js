@@ -42,21 +42,15 @@ const asyncHandler = (fn) => (req, res, next) => {
 };
 
 app.get("/api/files", asyncHandler(async (req, res) => {
-  const { year } = req.query;
+  const { year, course } = req.query;
 
   try {
     const dbFiles = await prisma.note.findMany({
       where: {
         ...(year && { year }),
+        ...(course && { course }),
       },
       orderBy: { createdAt: 'desc' },
-    });
-
-    const cloudinaryFiles = await cloudinary.api.resources({
-      type: "upload",
-      max_results: 1000,
-      resource_type: "raw",
-      prefix: "uploads/",
     });
 
     const organizedFiles = {
@@ -84,14 +78,13 @@ app.get("/api/files", asyncHandler(async (req, res) => {
       });
     });
 
-    console.log('Organized Files:', JSON.stringify(organizedFiles, null, 2));
-
     res.json(organizedFiles);
   } catch (error) {
     console.error('Comprehensive File Retrieval Error:', {
       message: error.message,
       stack: error.stack,
-      queryYear: year
+      queryYear: year,
+      queryCourse: course
     });
     res.status(500).json({
       message: 'Failed to retrieve files',
