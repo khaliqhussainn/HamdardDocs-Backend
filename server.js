@@ -16,7 +16,7 @@ app.options('*', cors());
 app.use(express.json());
 
 // Initialize Firebase Admin SDK
-const serviceAccount = require('./notesapp-1cf66-firebase-adminsdk-cacju-85b905f9e4.json'); // Update this path
+const serviceAccount = require('./notesapp-1cf66-firebase-adminsdk-cacju-85b905f9e4.json'); // Update  path
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: "https://notesapp-1cf66-default-rtdb.firebaseio.com"
