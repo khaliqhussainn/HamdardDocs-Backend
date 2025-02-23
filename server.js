@@ -5,6 +5,7 @@ const cloudinary = require("cloudinary").v2;
 const fs = require("fs");
 const path = require("path");
 const os = require("os");
+const admin = require('firebase-admin');
 const prisma = require('./db/db');
 require("dotenv").config();
 
@@ -13,6 +14,13 @@ const app = express();
 app.options('*', cors());
 
 app.use(express.json());
+
+// Initialize Firebase Admin SDK
+const serviceAccount = require('./notesapp-1cf66-firebase-adminsdk-cacju-85b905f9e4.json'); // Update this path
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://notesapp-1cf66-default-rtdb.firebaseio.com"
+});
 
 // Cloudinary configuration
 cloudinary.config({
@@ -39,6 +47,22 @@ const upload = multer({
 
 const asyncHandler = (fn) => (req, res, next) => {
   Promise.resolve(fn(req, res, next)).catch(next);
+};
+
+const verifyFirebaseToken = async (req, res, next) => {
+  const idToken = req.headers.authorization?.split('Bearer ')[1];
+  if (!idToken) {
+    return res.status(401).json({ message: 'No token provided' });
+  }
+
+  try {
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    req.user = decodedToken;
+    next();
+  } catch (error) {
+    console.error('Token verification error:', error);
+    res.status(401).json({ message: 'Unauthorized' });
+  }
 };
 
 app.get("/api/files", asyncHandler(async (req, res) => {
@@ -93,7 +117,7 @@ app.get("/api/files", asyncHandler(async (req, res) => {
   }
 }));
 
-app.post("/api/files", upload.single("file"), asyncHandler(async (req, res) => {
+app.post("/api/files", verifyFirebaseToken, upload.single("file"), asyncHandler(async (req, res) => {
   if (!req.file) {
     throw new Error("No file uploaded");
   }
